@@ -5,10 +5,11 @@ const quizService = quizServiceModule.default || quizServiceModule;
 
 export async function GET(_request, { params }) {
   try {
+    const { attemptId } = await params;
     const user = await requireUser();
     const result = await quizService.getCurrentQuestion({
       userId: user._id,
-      attemptId: params.attemptId,
+      attemptId,
     });
     return Response.json(result);
   } catch (error) {

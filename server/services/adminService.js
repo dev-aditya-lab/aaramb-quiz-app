@@ -9,7 +9,7 @@ function parseDateOrNull(value) {
   }
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) {
-    return null;
+    throw Object.assign(new Error("Invalid date/time format"), { status: 400 });
   }
   return parsed;
 }
@@ -45,19 +45,35 @@ async function listUsers() {
   return User.find({}).select("name email role isBanned disqualifiedQuizIds createdAt").sort({ createdAt: -1 }).lean();
 }
 
+async function deleteUser(userId) {
+  const user = await User.findById(userId).lean();
+  if (!user) {
+    throw Object.assign(new Error("User not found"), { status: 404 });
+  }
+
+  await Promise.all([
+    Attempt.deleteMany({ userId }),
+    User.findByIdAndDelete(userId),
+  ]);
+}
+
 async function banUser(userId, ban) {
-  return User.findByIdAndUpdate(userId, { isBanned: ban }, { new: true }).lean();
+  return User.findByIdAndUpdate(userId, { isBanned: ban }, { returnDocument: "after" }).lean();
 }
 
 async function disqualifyUserFromQuiz(userId, quizId) {
   return User.findByIdAndUpdate(
     userId,
     { $addToSet: { disqualifiedQuizIds: quizId } },
-    { new: true }
+    { returnDocument: "after" }
   ).lean();
 }
 
 async function createQuiz(payload, adminUserId) {
+  if (!payload.startsAt || !payload.endsAt) {
+    throw Object.assign(new Error("Quiz start and end date/time are required"), { status: 400 });
+  }
+
   const startsAt = parseDateOrNull(payload.startsAt);
   const endsAt = parseDateOrNull(payload.endsAt);
   validateSchedule(startsAt, endsAt);
@@ -94,24 +110,45 @@ async function createQuiz(payload, adminUserId) {
 }
 
 async function updateQuiz(quizId, payload) {
-  const startsAt = parseDateOrNull(payload.startsAt);
-  const endsAt = parseDateOrNull(payload.endsAt);
+  const existingQuiz = await Quiz.findById(quizId);
+  if (!existingQuiz) {
+    throw Object.assign(new Error("Quiz not found"), { status: 404 });
+  }
+
+  const merged = {
+    title: payload.title ?? existingQuiz.title,
+    description: payload.description ?? existingQuiz.description,
+    status: payload.status ?? existingQuiz.status,
+    timerMode: payload.timerMode ?? existingQuiz.timerMode,
+    quizTimeLimitSec: payload.quizTimeLimitSec ?? existingQuiz.quizTimeLimitSec,
+    perQuestionTimeLimitSec: payload.perQuestionTimeLimitSec ?? existingQuiz.perQuestionTimeLimitSec,
+    questionsPerAttempt: payload.questionsPerAttempt ?? existingQuiz.questionsPerAttempt,
+    startsAt: payload.startsAt ?? existingQuiz.startsAt,
+    endsAt: payload.endsAt ?? existingQuiz.endsAt,
+  };
+
+  if (!merged.startsAt || !merged.endsAt) {
+    throw Object.assign(new Error("Quiz start and end date/time are required"), { status: 400 });
+  }
+
+  const startsAt = parseDateOrNull(merged.startsAt);
+  const endsAt = parseDateOrNull(merged.endsAt);
   validateSchedule(startsAt, endsAt);
 
   const quiz = await Quiz.findByIdAndUpdate(
     quizId,
     {
-      title: payload.title,
-      description: payload.description,
-      status: payload.status,
-      timerMode: payload.timerMode,
+      title: merged.title,
+      description: merged.description,
+      status: merged.status,
+      timerMode: merged.timerMode,
       startsAt,
       endsAt,
-      quizTimeLimitSec: payload.quizTimeLimitSec,
-      perQuestionTimeLimitSec: payload.perQuestionTimeLimitSec,
-      questionsPerAttempt: payload.questionsPerAttempt,
+      quizTimeLimitSec: merged.quizTimeLimitSec,
+      perQuestionTimeLimitSec: merged.perQuestionTimeLimitSec,
+      questionsPerAttempt: merged.questionsPerAttempt,
     },
-    { new: true }
+    { returnDocument: "after" }
   );
 
   if (Array.isArray(payload.questions)) {
@@ -140,17 +177,109 @@ async function deleteQuiz(quizId) {
   await Quiz.findByIdAndDelete(quizId);
 }
 
+async function setQuizStatus(quizId, status) {
+  if (!["draft", "running", "paused"].includes(status)) {
+    throw Object.assign(new Error("Invalid status"), { status: 400 });
+  }
+
+  const quiz = await Quiz.findByIdAndUpdate(
+    quizId,
+    { status },
+    { returnDocument: "after" }
+  ).lean();
+
+  if (!quiz) {
+    throw Object.assign(new Error("Quiz not found"), { status: 404 });
+  }
+
+  return quiz;
+}
+
+async function getQuizWithQuestions(quizId) {
+  const [quiz, questions] = await Promise.all([
+    Quiz.findById(quizId).lean(),
+    Question.find({ quizId }).select("+correctOptionKey").sort({ order: 1 }).lean(),
+  ]);
+
+  if (!quiz) {
+    throw Object.assign(new Error("Quiz not found"), { status: 404 });
+  }
+
+  return {
+    ...quiz,
+    questions: questions.map((question) => ({
+      text: question.text,
+      options: question.options,
+      correctOptionKey: question.correctOptionKey,
+      points: question.points,
+      timeLimitSecOverride: question.timeLimitSecOverride,
+    })),
+  };
+}
+
 async function listQuizzesForAdmin() {
   return Quiz.find({}).sort({ createdAt: -1 }).lean();
+}
+
+async function listResults() {
+  return Attempt.find({ status: { $in: ["submitted", "disqualified", "expired"] } })
+    .sort({ submittedAt: -1, updatedAt: -1 })
+    .limit(1000)
+    .populate("userId", "name email")
+    .populate("quizId", "title")
+    .lean();
+}
+
+function escapeCsv(value) {
+  const text = value === null || value === undefined ? "" : String(value);
+  return `"${text.replaceAll('"', '""')}"`;
+}
+
+function buildResultsCsv(rows) {
+  const headers = [
+    "Attempt ID",
+    "User Name",
+    "User Email",
+    "Quiz Title",
+    "Status",
+    "Score",
+    "Warnings",
+    "Started At",
+    "Submitted At",
+  ];
+
+  const lines = [headers.join(",")];
+  for (const row of rows) {
+    lines.push(
+      [
+        escapeCsv(row._id),
+        escapeCsv(row.userId?.name || ""),
+        escapeCsv(row.userId?.email || ""),
+        escapeCsv(row.quizId?.title || ""),
+        escapeCsv(row.status || ""),
+        escapeCsv(row.totalScore ?? 0),
+        escapeCsv(row.warnings ?? 0),
+        escapeCsv(row.startedAt ? new Date(row.startedAt).toISOString() : ""),
+        escapeCsv(row.submittedAt ? new Date(row.submittedAt).toISOString() : ""),
+      ].join(",")
+    );
+  }
+
+  return lines.join("\n");
 }
 
 module.exports = {
   getDashboardStats,
   listUsers,
+  deleteUser,
   banUser,
   disqualifyUserFromQuiz,
   createQuiz,
   updateQuiz,
+  setQuizStatus,
+  getQuizWithQuestions,
   deleteQuiz,
   listQuizzesForAdmin,
+  listResults,
+  buildResultsCsv,
 };

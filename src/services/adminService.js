@@ -8,6 +8,13 @@ export function fetchAdminUsers() {
   return apiRequest("/admin/users");
 }
 
+export function deleteUser(userId) {
+  return apiRequest("/admin/users", {
+    method: "DELETE",
+    body: JSON.stringify({ userId }),
+  });
+}
+
 export function setUserBan(userId, isBanned) {
   return apiRequest(`/admin/users/${userId}/ban`, {
     method: "PATCH",
@@ -40,8 +47,23 @@ export function updateQuiz(quizId, payload) {
   });
 }
 
+export function updateQuizStatus(quizId, status) {
+  return apiRequest(`/admin/quizzes/${quizId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
+export function fetchAdminQuizDetail(quizId) {
+  return apiRequest(`/admin/quizzes/${quizId}`);
+}
+
 export function deleteQuiz(quizId) {
   return apiRequest(`/admin/quizzes/${quizId}`, {
     method: "DELETE",
   });
+}
+
+export function fetchAdminResults() {
+  return apiRequest("/admin/results");
 }

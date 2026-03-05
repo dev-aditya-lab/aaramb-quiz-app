@@ -12,3 +12,18 @@ export async function GET() {
     return apiErrorResponse(error);
   }
 }
+
+export async function DELETE(request) {
+  try {
+    await requireAdminUser();
+    const { userId } = await request.json();
+    if (!userId) {
+      return Response.json({ message: "userId is required" }, { status: 400 });
+    }
+
+    await adminService.deleteUser(userId);
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    return apiErrorResponse(error);
+  }
+}

@@ -5,11 +5,11 @@ const adminService = adminServiceModule.default || adminServiceModule;
 
 export async function PATCH(request, { params }) {
   try {
-    const { userId } = await params;
+    const { quizId } = await params;
     await requireAdminUser();
     const body = await request.json();
-    const user = await adminService.disqualifyUserFromQuiz(userId, body.quizId);
-    return Response.json({ user });
+    const quiz = await adminService.setQuizStatus(quizId, body.status);
+    return Response.json({ quiz });
   } catch (error) {
     return apiErrorResponse(error);
   }

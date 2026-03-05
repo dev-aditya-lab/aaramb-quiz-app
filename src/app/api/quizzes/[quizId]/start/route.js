@@ -5,10 +5,11 @@ const quizService = quizServiceModule.default || quizServiceModule;
 
 export async function POST(_request, { params }) {
   try {
+    const { quizId } = await params;
     const user = await requireUser();
     const attempt = await quizService.startAttempt({
       userId: user._id,
-      quizId: params.quizId,
+      quizId,
     });
     return Response.json({ attemptId: attempt._id });
   } catch (error) {

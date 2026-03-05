@@ -5,9 +5,10 @@ const adminService = adminServiceModule.default || adminServiceModule;
 
 export async function PATCH(request, { params }) {
   try {
+    const { userId } = await params;
     await requireAdminUser();
     const body = await request.json();
-    const user = await adminService.banUser(params.userId, Boolean(body.isBanned));
+    const user = await adminService.banUser(userId, Boolean(body.isBanned));
     return Response.json({ user });
   } catch (error) {
     return apiErrorResponse(error);
