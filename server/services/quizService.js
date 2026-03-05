@@ -69,6 +69,10 @@ async function startAttempt({ userId, quizId }) {
     quizId,
     assignedQuestionIds: pool.map((entry) => entry._id),
     startedAt: new Date(),
+    logs: [{
+      action: "STARTED",
+      message: "Started taking the quiz"
+    }]
   });
 }
 
@@ -131,8 +135,12 @@ async function getCurrentQuestion({ userId, attemptId }) {
 async function submitAnswer({ userId, attemptId, questionId, selectedOptionKey, clientSentAt }) {
   const now = new Date();
   const attempt = await Attempt.findOne({ _id: attemptId, userId });
-  if (!attempt || attempt.status !== "in_progress") {
+  if (!attempt) {
     throw Object.assign(new Error("Active attempt not found"), { status: 404 });
+  }
+
+  if (attempt.status !== "in_progress") {
+    throw Object.assign(new Error("Attempt is not active"), { status: 400 });
   }
 
   if (attempt.isLocked) {
@@ -183,7 +191,7 @@ async function submitAnswer({ userId, attemptId, questionId, selectedOptionKey, 
 
   const responseTimeMs = now.getTime() - new Date(questionServedAt).getTime();
 
-  // Only STRICTLY timeout the whole attempt if they are egregiously late 
+  // Only STRICTLY timeout the whole attempt if they are egregiously late
   // (e.g. they turned off JS to bypass the auto-submit).
   // We add a 15-second grace period for the client's auto-submit POST request to arrive.
   if (responseTimeMs > (effectiveQuestionLimitSec + 15) * 1000) {
@@ -203,12 +211,24 @@ async function submitAnswer({ userId, attemptId, questionId, selectedOptionKey, 
 
   attempt.answers.push({
     questionId,
-    selectedOptionKey,
+    selectedOptionKey: selectedOptionKey || "TIMEOUT",
     isCorrect,
     pointsAwarded: awarded,
     answeredAt: now,
     responseTimeMs,
   });
+
+  if (selectedOptionKey === "TIMEOUT") {
+    attempt.logs.push({
+      action: "TIMEOUT",
+      message: `Question timeout auto-submit. Scored 0 across ${responseTimeMs}ms.`
+    });
+  } else {
+    attempt.logs.push({
+      action: "ANSWERED",
+      message: `Answered question (Response time: ${Math.round(responseTimeMs / 1000)}s)`
+    });
+  }
 
   attempt.totalScore += awarded;
   attempt.currentQuestionIndex += 1;
@@ -230,20 +250,38 @@ async function submitAnswer({ userId, attemptId, questionId, selectedOptionKey, 
 
 async function reportProctorViolation({ userId, attemptId, reason }) {
   const attempt = await Attempt.findOne({ _id: attemptId, userId });
-  if (!attempt || attempt.status !== "in_progress" || attempt.isLocked) {
-    return;
+  if (!attempt) {
+    throw Object.assign(new Error("Attempt not found"), { status: 404 });
   }
 
-  const quiz = await Quiz.findById(attempt.quizId).lean();
+  if (attempt.status !== "in_progress") {
+    throw Object.assign(new Error("Attempt is not in progress"), { status: 400 });
+  }
+
+  const quiz = await Quiz.findById(attempt.quizId);
   const limit = quiz?.proctoringLimit || 3;
 
   attempt.warnings += 1;
-  if (attempt.warnings >= limit) {
+
+  // Also push a log entry
+  attempt.logs.push({
+    action: "VIOLATION",
+    message: `Proctoring violation: ${reason} (Warning ${attempt.warnings} of ${limit})`
+  });
+
+  if (attempt.warnings > limit) {
     attempt.status = "disqualified";
     attempt.isLocked = true;
-    attempt.disqualifyReason = reason || "Multiple proctoring violations";
+    attempt.disqualifyReason = reason || "Exceeded proctoring warning limit";
+
+    attempt.logs.push({
+      action: "DISQUALIFIED",
+      message: `User disqualified. Reason: ${attempt.disqualifyReason}`
+    });
   }
+
   await attempt.save();
+  return { warnings: attempt.warnings, status: attempt.status };
 }
 
 async function lockAttempt({ userId, attemptId }) {
@@ -255,6 +293,23 @@ async function lockAttempt({ userId, attemptId }) {
   await attempt.save();
 }
 
+// ---- LOG ACTIVITY ----
+async function logUserActivity({ attemptId, userId, action, message }) {
+  const attempt = await Attempt.findOne({ _id: attemptId, userId });
+  if (!attempt) {
+    throw Object.assign(new Error("Attempt not found"), { status: 404 });
+  }
+
+  attempt.logs.push({ action, message });
+
+  if (action === "MANUAL_EXIT") {
+    attempt.isLocked = true;
+  }
+
+  await attempt.save();
+  return true;
+}
+
 module.exports = {
   listAvailableQuizzes,
   startAttempt,
@@ -262,4 +317,5 @@ module.exports = {
   submitAnswer,
   reportProctorViolation,
   lockAttempt,
+  logUserActivity,
 };

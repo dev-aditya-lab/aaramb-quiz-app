@@ -42,6 +42,16 @@ const attemptSchema = new mongoose.Schema(
       default: {},
     },
     answers: { type: [answerSchema], default: [] },
+    logs: {
+      type: [
+        {
+          action: { type: String, required: true },
+          message: { type: String, required: true },
+          timestamp: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
     totalScore: { type: Number, default: 0 },
     warnings: { type: Number, default: 0 },
     disqualifyReason: { type: String, default: "" },

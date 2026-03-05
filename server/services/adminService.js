@@ -219,8 +219,13 @@ async function listQuizzesForAdmin() {
   return Quiz.find({}).sort({ createdAt: -1 }).lean();
 }
 
-async function listResults() {
-  return Attempt.find({ status: { $in: ["submitted", "disqualified", "expired"] } })
+async function listResults(filters = {}) {
+  const query = { status: { $in: ["submitted", "disqualified", "expired"] } };
+  if (filters.quizId) {
+    query.quizId = filters.quizId;
+  }
+
+  return Attempt.find(query)
     .sort({ submittedAt: -1, updatedAt: -1 })
     .limit(1000)
     .populate("userId", "name email")
