@@ -5,6 +5,51 @@ import { useRouter } from "next/navigation";
 import { FiPlayCircle, FiClock, FiHash, FiCalendar } from "react-icons/fi";
 import { fetchRunningQuizzes, startQuiz } from "@/services/quizService";
 
+function formatFriendlyDateTime(value) {
+  if (!value) {
+    return "Now";
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Scheduled";
+  }
+
+  return date.toLocaleString([], {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatStartsIn(value) {
+  if (!value) {
+    return "Live now";
+  }
+
+  const startsAt = new Date(value).getTime();
+  const now = Date.now();
+  const diffMs = startsAt - now;
+  if (!Number.isFinite(diffMs) || diffMs <= 0) {
+    return "Live now";
+  }
+
+  const totalMinutes = Math.floor(diffMs / (1000 * 60));
+  const days = Math.floor(totalMinutes / (60 * 24));
+  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) {
+    return `Starts in ${days}d ${hours}h`;
+  }
+  if (hours > 0) {
+    return `Starts in ${hours}h ${minutes}m`;
+  }
+  return `Starts in ${minutes}m`;
+}
+
 export default function QuizCatalog() {
   const [quizzes, setQuizzes] = useState([]);
   const [error, setError] = useState("");
@@ -72,9 +117,14 @@ export default function QuizCatalog() {
                 )}
               </div>
 
-              <p className="mt-2 text-sm text-slate-400">{quiz.description}</p>
+              <div className="mt-4 rounded-xl border border-slate-700/40 bg-slate-900/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Description / Instructions</p>
+                <p className="mt-2 min-h-[52px] text-sm leading-6 text-slate-300">
+                  {quiz.description || "No instructions provided yet. Please read quiz rules carefully before starting."}
+                </p>
+              </div>
 
-              <div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-500">
+              <div className="mt-4 flex flex-wrap gap-3 text-xs text-slate-400">
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1">
                   <FiClock className="h-3 w-3" />
                   {quiz.timerMode}
@@ -85,14 +135,17 @@ export default function QuizCatalog() {
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1">
                   <FiCalendar className="h-3 w-3" />
-                  {quiz.startsAt ? new Date(quiz.startsAt).toLocaleString() : "Now"}
+                  {formatFriendlyDateTime(quiz.startsAt)}
                 </span>
               </div>
 
               {isScheduled ? (
-                <div className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-800/80 border border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-400 shadow-sm">
-                  <FiClock className="h-4 w-4" />
-                  Starts at {new Date(quiz.startsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                <div className="mt-5 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-200">
+                  <p className="flex items-center gap-2 font-semibold">
+                    <FiClock className="h-4 w-4" />
+                    {formatStartsIn(quiz.startsAt)}
+                  </p>
+                  <p className="mt-1 text-xs text-cyan-300/80">Scheduled for {formatFriendlyDateTime(quiz.startsAt)}</p>
                 </div>
               ) : (
                 <button
