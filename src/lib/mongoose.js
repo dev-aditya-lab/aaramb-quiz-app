@@ -19,7 +19,6 @@ export async function connectMongoose() {
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(uri, {
-      dbName: "quiz_app",
       maxPoolSize: 25,
       minPoolSize: 5,
       serverSelectionTimeoutMS: 5000,
