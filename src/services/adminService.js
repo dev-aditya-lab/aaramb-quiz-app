@@ -75,6 +75,10 @@ export function fetchAdminResults() {
   return apiRequest("/admin/results");
 }
 
+export function fetchAdminAuditLogs() {
+  return apiRequest("/admin/audit-logs");
+}
+
 export function resetAttempt(attemptId) {
   return apiRequest(`/admin/attempts/${attemptId}/reset`, {
     method: "DELETE",

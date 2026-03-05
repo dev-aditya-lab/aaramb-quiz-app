@@ -2,6 +2,7 @@ const Quiz = require("../models/Quiz");
 const Question = require("../models/Question");
 const User = require("../models/User");
 const Attempt = require("../models/Attempt");
+const AdminAuditLog = require("../models/AdminAuditLog");
 
 function parseDateOrNull(value) {
   if (!value) {
@@ -58,7 +59,18 @@ async function deleteUser(userId) {
 }
 
 async function banUser(userId, ban) {
-  return User.findByIdAndUpdate(userId, { isBanned: ban }, { returnDocument: "after" }).lean();
+  const user = await User.findById(userId);
+  if (!user) {
+    throw Object.assign(new Error("User not found"), { status: 404 });
+  }
+
+  if (ban && user.role === "admin") {
+    throw Object.assign(new Error("Admin users cannot be banned"), { status: 403 });
+  }
+
+  user.isBanned = Boolean(ban);
+  await user.save();
+  return user.toObject();
 }
 
 async function disqualifyUserFromQuiz(userId, quizId) {
@@ -252,6 +264,25 @@ async function listResults(filters = {}) {
     .lean();
 }
 
+async function createAuditLog({ actorUserId, actorRole, action, targetType, targetId, details }) {
+  await AdminAuditLog.create({
+    actorUserId,
+    actorRole,
+    action,
+    targetType,
+    targetId: targetId ? String(targetId) : "",
+    details: details || {},
+  });
+}
+
+async function listAuditLogs() {
+  return AdminAuditLog.find({ actorRole: "manager" })
+    .sort({ createdAt: -1 })
+    .limit(500)
+    .populate("actorUserId", "name email role")
+    .lean();
+}
+
 function escapeCsv(value) {
   const text = value === null || value === undefined ? "" : String(value);
   return `"${text.replaceAll('"', '""')}"`;
@@ -304,5 +335,7 @@ module.exports = {
   deleteQuiz,
   listQuizzesForAdmin,
   listResults,
+  createAuditLog,
+  listAuditLogs,
   buildResultsCsv,
 };

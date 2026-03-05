@@ -86,6 +86,11 @@ export default function AdminUsersTab({
                                 <div className="min-w-0">
                                     <p className="font-semibold text-white truncate flex items-center gap-2">
                                         {user.name || user.email}
+                                        {user.role === "admin" && (
+                                            <span className="inline-flex items-center rounded-full bg-cyan-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                                                Admin
+                                            </span>
+                                        )}
                                         {user.isBanned && (
                                             <span className="inline-flex items-center rounded-full bg-rose-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-rose-400">
                                                 Banned
@@ -126,10 +131,11 @@ export default function AdminUsersTab({
                                     <button
                                         type="button"
                                         onClick={() => onBan(user._id, !user.isBanned)}
+                                        disabled={user.role === "admin"}
                                         className={user.isBanned ? btnOutline : btnDanger}
                                     >
                                         <FiUserX className="h-3.5 w-3.5" />
-                                        {user.isBanned ? "Unban" : "Ban"}
+                                        {user.role === "admin" ? "Protected" : user.isBanned ? "Unban" : "Ban"}
                                     </button>
 
                                     <select

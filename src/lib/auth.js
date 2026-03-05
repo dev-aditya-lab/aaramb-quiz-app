@@ -51,8 +51,12 @@ export const authOptions = {
     async signIn({ user }) {
       await connectMongoose();
 
+      if (!user?.email) {
+        return false;
+      }
+
       const existing = await User.findOne({ email: user.email });
-      if (existing.isBanned) {
+      if (existing?.isBanned) {
         return false;
       }
 

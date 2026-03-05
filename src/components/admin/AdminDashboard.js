@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { FiAlertTriangle, FiXCircle } from "react-icons/fi";
 import {
@@ -13,6 +13,7 @@ import {
   fetchAdminResults,
   fetchAdminStats,
   fetchAdminUsers,
+  fetchAdminAuditLogs,
   setUserRole,
   setUserBan,
   updateQuiz,
@@ -25,6 +26,7 @@ import AdminOverviewTab from "./AdminOverviewTab";
 import AdminQuizzesTab from "./AdminQuizzesTab";
 import AdminUsersTab from "./AdminUsersTab";
 import AdminResultsTab from "./AdminResultsTab";
+import AdminAuditLogsTab from "./AdminAuditLogsTab";
 
 const emptyForm = {
   title: "",
@@ -63,6 +65,7 @@ export default function AdminDashboard() {
   const [quizzes, setQuizzes] = useState([]);
   const [users, setUsers] = useState([]);
   const [results, setResults] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [questionJson, setQuestionJson] = useState("[]");
   const [disqualifyQuizIdByUser, setDisqualifyQuizIdByUser] = useState({});
@@ -75,7 +78,7 @@ export default function AdminDashboard() {
   const canManageQuiz = isAdmin;
   const canManageRoles = isAdmin;
 
-  async function loadAll() {
+  const loadAll = useCallback(async () => {
     try {
       const [s, q, u, r] = await Promise.all([
         fetchAdminStats(),
@@ -87,16 +90,23 @@ export default function AdminDashboard() {
       setQuizzes(q.quizzes || []);
       setUsers(u.users || []);
       setResults(r.rows || []);
+
+      if (isAdmin) {
+        const logsResponse = await fetchAdminAuditLogs();
+        setAuditLogs(logsResponse.rows || []);
+      } else {
+        setAuditLogs([]);
+      }
     } catch (err) {
       setError(err.message || "Failed to load admin dashboard");
     }
-  }
+  }, [isAdmin]);
 
   useEffect(() => {
     queueMicrotask(() => {
       loadAll();
     });
-  }, []);
+  }, [loadAll]);
 
   async function onCreateQuiz(event) {
     event.preventDefault();
@@ -273,7 +283,8 @@ export default function AdminDashboard() {
     { id: "overview", label: "Dashboard" },
     { id: "quizzes", label: "Quizzes" },
     { id: "users", label: "Users" },
-    { id: "results", label: "Results & Requests" }
+    { id: "results", label: "Results & Requests" },
+    ...(isAdmin ? [{ id: "audit", label: "Manager Logs" }] : []),
   ];
 
   return (
@@ -374,6 +385,10 @@ export default function AdminDashboard() {
           onUnlockAttempt={handleUnlockAttempt}
           onResetAttempt={handleResetAttempt}
         />
+      )}
+
+      {activeTab === "audit" && isAdmin && (
+        <AdminAuditLogsTab logs={auditLogs} />
       )}
 
     </div>

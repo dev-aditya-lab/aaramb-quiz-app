@@ -15,7 +15,7 @@ async function getLandingData() {
 
   const hasRunningQuiz = Boolean(
     await Quiz.exists({
-      status: "running",
+      status: { $in: ["published", "running"] },
       $or: [{ startsAt: null }, { startsAt: { $lte: now } }],
       $and: [{ $or: [{ endsAt: null }, { endsAt: { $gte: now } }] }],
     })
