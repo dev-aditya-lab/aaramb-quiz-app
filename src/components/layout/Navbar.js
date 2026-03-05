@@ -12,6 +12,7 @@ import {
   FiAward,
   FiMenu,
   FiX,
+  FiEdit3,
 } from "react-icons/fi";
 
 export default function Navbar() {
@@ -32,12 +33,8 @@ export default function Navbar() {
           href="/"
           className="flex items-center gap-2.5 text-lg font-bold text-white transition-opacity hover:opacity-80"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-cyan-500 to-purple-600">
-            <span className="text-sm font-extrabold text-white">A</span>
-          </div>
-          <span>
-            Aarambh<span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent"> Quiz</span>
-          </span>
+          <FiEdit3 className="h-5 w-5 text-cyan-400" />
+          <span>Aarambh Quiz App</span>
         </Link>
 
         {/* Desktop nav */}

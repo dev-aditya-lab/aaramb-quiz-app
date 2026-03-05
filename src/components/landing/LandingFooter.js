@@ -13,7 +13,7 @@ export default function LandingFooter() {
                     {/* Brand */}
                     <div>
                         <h3 className="text-xl font-extrabold text-white">
-                            Aarambh<span className="landing-gradient-text"> Quiz</span>
+                            Aarambh Quiz App
                         </h3>
                         <p className="mt-2 text-sm text-slate-400 max-w-md">
                             The official quiz platform of Aarambh Club, built to make technical
