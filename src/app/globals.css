@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+@layer base {
+	:root {
+		color-scheme: light;
+	}
+
+	html,
+	body {
+		min-height: 100%;
+		background-color: #f4f4f5;
+		color: #18181b;
+	}
+
+	body {
+		font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	}
+
+	a,
+	button {
+		color: inherit;
+	}
+
+	input,
+	textarea,
+	select,
+	button {
+		outline: none;
+	}
+
+	input:focus,
+	textarea:focus,
+	select:focus,
+	button:focus-visible {
+		box-shadow: 0 0 0 2px #a1a1aa;
+		border-color: #52525b;
+	}
+}
