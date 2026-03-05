@@ -8,7 +8,7 @@ import Quiz from "../../../server/models/Quiz";
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) {
-    redirect("/login");
+    redirect(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`);
   }
 
   if (session.user.isBanned) {

@@ -7,7 +7,7 @@ export default async function AttemptPage({ params }) {
   const { attemptId } = await params;
   const session = await getServerSession(authOptions);
   if (!session) {
-    redirect("/login");
+    redirect(`/login?callbackUrl=${encodeURIComponent(`/quiz/${attemptId}`)}`);
   }
 
   return (

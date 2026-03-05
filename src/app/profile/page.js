@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   FiUser,
@@ -30,6 +30,7 @@ const BRANCH_OPTIONS = [
 export default function ProfilePage() {
   const { status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +48,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login");
+      router.replace(`/login?callbackUrl=${encodeURIComponent(pathname || "/profile")}`);
       return;
     }
 
@@ -90,7 +91,7 @@ export default function ProfilePage() {
     }
 
     loadProfileData();
-  }, [router, status]);
+  }, [router, status, pathname]);
 
   const canSubmit = useMemo(() => {
     return Boolean(form.fullName && form.branch && form.yearOfStudy && form.studentId && form.phoneNumber);

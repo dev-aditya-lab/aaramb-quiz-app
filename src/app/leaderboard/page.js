@@ -2,19 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { FiAward } from "react-icons/fi";
 import { fetchLeaderboard } from "@/services/leaderboardService";
 
 export default function LeaderboardPage() {
   const { status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const [rows, setRows] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
-      router.replace("/login");
+      router.replace(`/login?callbackUrl=${encodeURIComponent(pathname || "/leaderboard")}`);
       return;
     }
 
@@ -23,7 +24,7 @@ export default function LeaderboardPage() {
         .then((data) => setRows(data.rows || []))
         .catch((err) => setError(err.message || "Unable to load leaderboard"));
     }
-  }, [status, router]);
+  }, [status, router, pathname]);
 
   return (
     <section className="space-y-4">

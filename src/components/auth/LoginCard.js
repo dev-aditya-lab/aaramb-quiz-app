@@ -2,20 +2,53 @@
 
 import { signIn, useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { FiGithub } from "react-icons/fi";
 
-export default function LoginCard() {
+function normalizeCallbackUrl(value) {
+  if (!value || typeof value !== "string") {
+    return "/dashboard";
+  }
+
+  let candidate = value.trim();
+  try {
+    candidate = decodeURIComponent(candidate);
+  } catch {
+    // keep original candidate
+  }
+
+  if (candidate.startsWith("/")) {
+    return candidate;
+  }
+
+  try {
+    const callback = new URL(candidate);
+    if (typeof window !== "undefined" && callback.origin === window.location.origin) {
+      return `${callback.pathname}${callback.search}${callback.hash}`;
+    }
+  } catch {
+    // ignore parse errors and fallback
+  }
+
+  return "/dashboard";
+}
+
+export default function LoginCard({ callbackUrl = "/dashboard" }) {
   const { status } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const error = searchParams.get("error") || "";
 
+  const resolvedCallbackUrl = useMemo(() => {
+    const fromQuery = searchParams.get("callbackUrl");
+    return normalizeCallbackUrl(fromQuery || callbackUrl);
+  }, [searchParams, callbackUrl]);
+
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace("/dashboard");
+      router.replace(resolvedCallbackUrl);
     }
-  }, [status, router]);
+  }, [status, router, resolvedCallbackUrl]);
 
   return (
     <section className="mx-auto mt-10 max-w-md rounded-xl border border-zinc-200 bg-white p-8 shadow-sm">
@@ -28,7 +61,7 @@ export default function LoginCard() {
       ) : null}
       <button
         type="button"
-        onClick={() => signIn("github", { callbackUrl: "/dashboard" })}
+        onClick={() => signIn("github", { callbackUrl: resolvedCallbackUrl })}
         className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-zinc-900 px-4 py-3 font-medium text-white transition hover:bg-zinc-800"
       >
         <FiGithub /> Continue with GitHub
