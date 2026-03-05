@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   }
 
   if (session.user.isBanned) {
-    return <p className="rounded-md border border-rose-300 bg-rose-50 p-4 text-rose-800">Your account is blocked.</p>;
+    return <p className="rounded-xl border border-rose-500/30 bg-rose-950/30 p-4 text-rose-300">Your account is blocked.</p>;
   }
 
   await connectMongoose();

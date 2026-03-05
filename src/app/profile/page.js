@@ -3,6 +3,21 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import {
+  FiUser,
+  FiMail,
+  FiBookOpen,
+  FiCalendar,
+  FiHash,
+  FiPhone,
+  FiCamera,
+  FiSave,
+  FiClock,
+  FiAward,
+  FiCheckCircle,
+  FiAlertCircle,
+} from "react-icons/fi";
 
 const BRANCH_OPTIONS = [
   "computer science and engineering",
@@ -119,40 +134,102 @@ export default function ProfilePage() {
   }
 
   if (loading || status === "loading") {
-    return <p className="text-sm text-zinc-600">Loading profile...</p>;
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+          <p className="mt-3 text-sm text-slate-400">Loading profile...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <section className="space-y-6">
-      <header className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-zinc-900">Student Profile</h1>
-        <p className="mt-1 text-sm text-zinc-600">Manage your student details and review your quiz attempt history.</p>
+      {/* ─── Profile Header ─── */}
+      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
+        <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-cyan-500/10 blur-3xl" />
+        <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl" />
+
+        <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center">
+          {/* Avatar */}
+          <div className="relative flex-shrink-0">
+            {form.image ? (
+              <Image
+                src={form.image}
+                alt={form.fullName || "Profile"}
+                width={80}
+                height={80}
+                className="rounded-2xl border-2 border-white/10 object-cover"
+              />
+            ) : (
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-white/10 bg-gradient-to-br from-cyan-500/20 to-purple-500/20">
+                <FiUser className="h-8 w-8 text-slate-400" />
+              </div>
+            )}
+          </div>
+
+          <div>
+            <p className="text-sm font-medium text-cyan-400">Student Profile</p>
+            <h1 className="mt-1 text-2xl font-extrabold text-white">
+              {form.fullName || "Your Profile"}
+            </h1>
+            <p className="mt-1 text-sm text-slate-400">
+              Manage your student details and review your quiz history.
+            </p>
+          </div>
+        </div>
       </header>
 
-      <form onSubmit={onSubmit} className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <div className="grid gap-3 md:grid-cols-2">
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Full Name</span>
+      {/* ─── Profile Form ─── */}
+      <form onSubmit={onSubmit} className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 md:p-8 shadow-sm">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-6">
+          <FiUser className="h-5 w-5 text-cyan-400" />
+          Personal Information
+        </h2>
+
+        <div className="grid gap-5 md:grid-cols-2">
+          {/* Full Name */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiUser className="h-3.5 w-3.5 text-slate-500" />
+              Full Name
+            </span>
             <input
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-colors focus:border-cyan-500/50 focus:bg-slate-700"
+              placeholder="Enter your full name"
               value={form.fullName}
-              onChange={(event) => setForm((current) => ({ ...current, fullName: event.target.value }))}
+              onChange={(e) => setForm((c) => ({ ...c, fullName: e.target.value }))}
               required
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Email (GitHub)</span>
-            <input className="rounded-md border border-zinc-300 bg-zinc-50 px-3 py-2" value={form.email} disabled />
+
+          {/* Email */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiMail className="h-3.5 w-3.5 text-slate-500" />
+              Email (GitHub)
+            </span>
+            <input
+              className="rounded-xl border border-slate-600/50 bg-slate-900/50 px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed"
+              value={form.email}
+              disabled
+            />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700 md:col-span-2">
-            <span className="font-medium">Branch</span>
+
+          {/* Branch */}
+          <label className="flex flex-col gap-1.5 md:col-span-2">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiBookOpen className="h-3.5 w-3.5 text-slate-500" />
+              Branch
+            </span>
             <select
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2.5 text-sm text-white transition-colors focus:border-cyan-500/50 focus:bg-slate-700"
               value={form.branch}
-              onChange={(event) => setForm((current) => ({ ...current, branch: event.target.value }))}
+              onChange={(e) => setForm((c) => ({ ...c, branch: e.target.value }))}
               required
             >
-              <option value="">Select branch</option>
+              <option value="">Select your branch</option>
               {BRANCH_OPTIONS.map((option) => (
                 <option key={option} value={option}>
                   {option}
@@ -160,78 +237,142 @@ export default function ProfilePage() {
               ))}
             </select>
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Year of Study</span>
+
+          {/* Year of Study */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiCalendar className="h-3.5 w-3.5 text-slate-500" />
+              Year of Study
+            </span>
             <input
               type="number"
               min={1}
               max={8}
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-colors focus:border-cyan-500/50 focus:bg-slate-700"
+              placeholder="e.g. 2"
               value={form.yearOfStudy}
-              onChange={(event) => setForm((current) => ({ ...current, yearOfStudy: event.target.value }))}
+              onChange={(e) => setForm((c) => ({ ...c, yearOfStudy: e.target.value }))}
               required
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Student ID</span>
+
+          {/* Student ID */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiHash className="h-3.5 w-3.5 text-slate-500" />
+              Student ID
+            </span>
             <input
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-colors focus:border-cyan-500/50 focus:bg-slate-700"
+              placeholder="Enter your student ID"
               value={form.studentId}
-              onChange={(event) => setForm((current) => ({ ...current, studentId: event.target.value }))}
+              onChange={(e) => setForm((c) => ({ ...c, studentId: e.target.value }))}
               required
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Phone / WhatsApp</span>
+
+          {/* Phone */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiPhone className="h-3.5 w-3.5 text-slate-500" />
+              Phone / WhatsApp
+            </span>
             <input
-              className="rounded-md border border-zinc-300 px-3 py-2"
+              className="rounded-xl border border-slate-600/50 bg-slate-700/50 px-4 py-2.5 text-sm text-white placeholder-slate-500 transition-colors focus:border-cyan-500/50 focus:bg-slate-700"
+              placeholder="Enter your phone number"
               value={form.phoneNumber}
-              onChange={(event) => setForm((current) => ({ ...current, phoneNumber: event.target.value }))}
+              onChange={(e) => setForm((c) => ({ ...c, phoneNumber: e.target.value }))}
               required
             />
           </label>
-          <label className="flex flex-col gap-1 text-sm text-zinc-700">
-            <span className="font-medium">Profile Picture (GitHub)</span>
-            <input className="rounded-md border border-zinc-300 bg-zinc-50 px-3 py-2" value={form.image ? "Synced from GitHub" : "Not available"} disabled />
+
+          {/* Profile Picture */}
+          <label className="flex flex-col gap-1.5">
+            <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
+              <FiCamera className="h-3.5 w-3.5 text-slate-500" />
+              Profile Picture (GitHub)
+            </span>
+            <input
+              className="rounded-xl border border-slate-600/50 bg-slate-900/50 px-4 py-2.5 text-sm text-slate-500 cursor-not-allowed"
+              value={form.image ? "Synced from GitHub" : "Not available"}
+              disabled
+            />
           </label>
         </div>
 
-        {error ? <p className="mt-3 rounded-md border border-rose-300 bg-rose-50 p-2 text-sm text-rose-700">{error}</p> : null}
-        {success ? <p className="mt-3 rounded-md border border-emerald-300 bg-emerald-50 p-2 text-sm text-emerald-700">{success}</p> : null}
+        {/* Messages */}
+        {error && (
+          <div className="mt-5 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/30 p-3 text-sm text-rose-300">
+            <FiAlertCircle className="h-4 w-4 flex-shrink-0" />
+            {error}
+          </div>
+        )}
+        {success && (
+          <div className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-3 text-sm text-emerald-300">
+            <FiCheckCircle className="h-4 w-4 flex-shrink-0" />
+            {success}
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={saving || !canSubmit}
-          className="mt-4 inline-flex items-center rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
+          <FiSave className="h-4 w-4" />
           {saving ? "Saving..." : "Save Profile"}
         </button>
       </form>
 
-      <section className="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-zinc-900">Quiz Attempt History</h2>
+      {/* ─── Quiz History ─── */}
+      <section className="rounded-2xl border border-slate-700/50 bg-slate-800/60 p-6 md:p-8 shadow-sm">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2 mb-5">
+          <FiClock className="h-5 w-5 text-cyan-400" />
+          Quiz Attempt History
+        </h2>
+
         {!history.length ? (
-          <p className="mt-3 rounded-md border border-zinc-200 bg-zinc-50 p-3 text-sm text-zinc-600">
-            You have not attempted any quiz yet.
-          </p>
+          <div className="rounded-xl border border-slate-700/30 bg-slate-900/40 p-8 text-center">
+            <FiAward className="mx-auto h-8 w-8 text-slate-600 mb-3" />
+            <p className="text-sm text-slate-400">
+              You have not attempted any quiz yet. Start a quiz to see your history here.
+            </p>
+          </div>
         ) : (
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-zinc-50 text-zinc-600">
-                <tr>
-                  <th className="px-3 py-2">Quiz</th>
-                  <th className="px-3 py-2">Score</th>
-                  <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2">Date</th>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-white/10">
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Quiz</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Score</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Status</th>
+                  <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-400">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((attempt) => (
-                  <tr key={attempt._id} className="border-t border-zinc-100">
-                    <td className="px-3 py-2">{attempt.quizId?.title || "Quiz"}</td>
-                    <td className="px-3 py-2">{attempt.totalScore ?? 0}</td>
-                    <td className="px-3 py-2 capitalize">{attempt.status}</td>
-                    <td className="px-3 py-2">{new Date(attempt.createdAt).toLocaleString()}</td>
+                  <tr key={attempt._id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                    <td className="px-4 py-3.5 text-sm font-medium text-white">
+                      {attempt.quizId?.title || "Quiz"}
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className="inline-flex items-center rounded-full bg-cyan-500/10 px-2.5 py-0.5 text-sm font-bold text-cyan-400">
+                        {attempt.totalScore ?? 0}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${attempt.status === "submitted"
+                          ? "bg-emerald-500/10 text-emerald-400"
+                          : attempt.status === "in-progress"
+                            ? "bg-amber-500/10 text-amber-400"
+                            : "bg-slate-500/10 text-slate-400"
+                        }`}>
+                        {attempt.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3.5 text-sm text-slate-500">
+                      {new Date(attempt.createdAt).toLocaleString()}
+                    </td>
                   </tr>
                 ))}
               </tbody>

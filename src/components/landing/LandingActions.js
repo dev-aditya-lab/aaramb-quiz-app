@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { FiArrowRight, FiGithub } from "react-icons/fi";
 import ProfileCompletionModal from "@/components/profile/ProfileCompletionModal";
 
 export default function LandingActions({ sessionUser }) {
@@ -25,34 +26,33 @@ export default function LandingActions({ sessionUser }) {
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-3">
-        <Link href="/dashboard" className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800">
-          Start Quiz
+      <div className="flex flex-wrap items-center gap-4">
+        <Link
+          href="/dashboard"
+          className="landing-btn-primary inline-flex items-center gap-2 text-sm"
+        >
+          {sessionUser ? "Go to Dashboard" : "Start Quiz"}
+          <FiArrowRight className="w-4 h-4" />
         </Link>
-        <button
-          type="button"
-          onClick={onLoginClick}
-          className="rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
-        >
-          Login with GitHub
-        </button>
-      </div>
-
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={onSignUpClick}
-          className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800"
-        >
-          Sign Up
-        </button>
-        <button
-          type="button"
-          onClick={onLoginClick}
-          className="rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 hover:bg-zinc-50"
-        >
-          Login with GitHub
-        </button>
+        {!sessionUser && (
+          <>
+            <button
+              type="button"
+              onClick={onLoginClick}
+              className="landing-btn-secondary inline-flex items-center gap-2 text-sm"
+            >
+              <FiGithub className="w-4 h-4" />
+              Login with GitHub
+            </button>
+            <button
+              type="button"
+              onClick={onSignUpClick}
+              className="landing-btn-secondary inline-flex items-center gap-2 text-sm"
+            >
+              Sign Up
+            </button>
+          </>
+        )}
       </div>
 
       {showModal ? (
