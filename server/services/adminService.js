@@ -21,6 +21,14 @@ function validateSchedule(startsAt, endsAt) {
   }
 }
 
+function normalizeProctoringLimit(value, fallback = 3) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) {
+    return fallback;
+  }
+  return Math.max(1, Math.floor(numeric));
+}
+
 async function getDashboardStats() {
   const [users, activeQuizzes, attempts, leaderboardTop] = await Promise.all([
     User.countDocuments({}),
@@ -115,6 +123,7 @@ async function createQuiz(payload, adminUserId) {
     status: payload.status || "draft",
     createdBy: adminUserId,
     questionsPerAttempt: payload.questionsPerAttempt || 20,
+    proctoringLimit: normalizeProctoringLimit(payload.proctoringLimit, 3),
     timerMode: payload.timerMode || "quiz",
     startsAt,
     endsAt,
@@ -153,6 +162,10 @@ async function updateQuiz(quizId, payload) {
     quizTimeLimitSec: payload.quizTimeLimitSec ?? existingQuiz.quizTimeLimitSec,
     perQuestionTimeLimitSec: payload.perQuestionTimeLimitSec ?? existingQuiz.perQuestionTimeLimitSec,
     questionsPerAttempt: payload.questionsPerAttempt ?? existingQuiz.questionsPerAttempt,
+    proctoringLimit: normalizeProctoringLimit(
+      payload.proctoringLimit ?? existingQuiz.proctoringLimit,
+      normalizeProctoringLimit(existingQuiz.proctoringLimit, 3)
+    ),
     startsAt: payload.startsAt ?? existingQuiz.startsAt,
     endsAt: payload.endsAt ?? existingQuiz.endsAt,
   };
@@ -177,6 +190,7 @@ async function updateQuiz(quizId, payload) {
       quizTimeLimitSec: merged.quizTimeLimitSec,
       perQuestionTimeLimitSec: merged.perQuestionTimeLimitSec,
       questionsPerAttempt: merged.questionsPerAttempt,
+      proctoringLimit: merged.proctoringLimit,
     },
     { returnDocument: "after" }
   );

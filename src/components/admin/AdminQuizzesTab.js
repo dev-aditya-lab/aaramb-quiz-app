@@ -57,9 +57,11 @@ export default function AdminQuizzesTab({
                         )}
                     </h2>
 
-                    <form onSubmit={(e) => {
-                        onCreateQuiz(e);
-                        setShowForm(false);
+                    <form onSubmit={async (e) => {
+                        const success = await onCreateQuiz(e);
+                        if (success) {
+                            setShowForm(false);
+                        }
                     }} className="grid gap-5 md:grid-cols-2">
                         <label className="flex flex-col gap-1.5">
                             <span className="flex items-center gap-1.5 text-sm font-medium text-slate-300">
@@ -253,7 +255,7 @@ export default function AdminQuizzesTab({
                                         </span>
                                     </div>
                                     <p className="mt-1 text-xs text-slate-600">
-                                        Timer: {quiz.timerMode === "quiz" ? "Off" : `${quiz.perQuestionTimeLimitSec}s per question`} | Limit: {quiz.proctoringLimit || 3}
+                                        Timer: {quiz.timerMode === "quiz" ? "Off" : `${quiz.perQuestionTimeLimitSec}s per question`} | Limit: {quiz.proctoringLimit ?? 3}
                                     </p>
                                 </div>
 

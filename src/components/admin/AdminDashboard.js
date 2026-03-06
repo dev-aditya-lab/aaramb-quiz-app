@@ -55,6 +55,12 @@ function toLocalInputValue(value) {
   return local.toISOString().slice(0, 16);
 }
 
+function normalizePositiveInt(value, fallback) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return fallback;
+  return Math.max(1, Math.floor(numeric));
+}
+
 export default function AdminDashboard() {
   const { data: session } = useSession();
   const [activeTab, setActiveTab] = useState("overview"); // overview, quizzes, users, results
@@ -103,15 +109,15 @@ export default function AdminDashboard() {
     try {
       if (!canCreateQuiz) {
         setError("Manager role is not allowed to create quizzes");
-        return;
+        return false;
       }
       if (!form.startsAt || !form.endsAt) {
         setError("Quiz start and end date/time are required");
-        return;
+        return false;
       }
       if (new Date(form.endsAt).getTime() <= new Date(form.startsAt).getTime()) {
         setError("Quiz end date/time must be later than start date/time");
-        return;
+        return false;
       }
 
       const parsedQuestions = JSON.parse(questionJson || "[]");
@@ -121,7 +127,7 @@ export default function AdminDashboard() {
         quizTimeLimitSec: 3600,
         perQuestionTimeLimitSec: form.usePerQuestionTimer ? Number(form.perQuestionTimeLimitSec || 30) : 30,
         questionsPerAttempt: Number(form.questionsPerAttempt || 20),
-        proctoringLimit: Number(form.proctoringLimit || 3),
+        proctoringLimit: normalizePositiveInt(form.proctoringLimit, 3),
         startsAt: toIsoOrEmpty(form.startsAt),
         endsAt: toIsoOrEmpty(form.endsAt),
         questions: parsedQuestions,
@@ -129,16 +135,18 @@ export default function AdminDashboard() {
 
       if (editingQuizId) {
         await updateQuiz(editingQuizId, payload);
+        setEditingQuizId("");
       } else {
         await createQuiz(payload);
+        setForm(emptyForm);
+        setQuestionJson("[]");
       }
-      setForm(emptyForm);
-      setQuestionJson("[]");
-      setEditingQuizId("");
       setError("");
       await loadAll();
+      return true;
     } catch (err) {
       setError(err.message || "Unable to create quiz");
+      return false;
     }
   }
 
@@ -187,7 +195,7 @@ export default function AdminDashboard() {
         endsAt: toLocalInputValue(quiz.endsAt),
         perQuestionTimeLimitSec: quiz.perQuestionTimeLimitSec || 30,
         questionsPerAttempt: quiz.questionsPerAttempt || 20,
-        proctoringLimit: quiz.proctoringLimit || 3,
+        proctoringLimit: quiz.proctoringLimit ?? 3,
       });
       setQuestionJson(JSON.stringify(quiz.questions || [], null, 2));
     } catch (err) {

@@ -127,7 +127,7 @@ async function getCurrentQuestion({ userId, attemptId }) {
     },
     quizTimeLimitSec: quiz.quizTimeLimitSec,
     timerMode: quiz.timerMode,
-    limitWarnings: quiz.proctoringLimit || 3,
+    limitWarnings: quiz.proctoringLimit ?? 3,
     isLocked: attempt.isLocked || false,
   };
 }
@@ -259,7 +259,7 @@ async function reportProctorViolation({ userId, attemptId, reason }) {
   }
 
   const quiz = await Quiz.findById(attempt.quizId);
-  const limit = quiz?.proctoringLimit || 3;
+  const limit = quiz?.proctoringLimit ?? 3;
 
   attempt.warnings += 1;
 

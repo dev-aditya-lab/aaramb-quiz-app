@@ -28,7 +28,7 @@ export function useQuizSession(attemptId) {
         progress: data.progress || null,
         quizTimeLimitSec: data.quizTimeLimitSec || null,
         timerMode: data.timerMode || "quiz",
-        limitWarnings: data.limitWarnings || 3,
+        limitWarnings: data.limitWarnings ?? 3,
         isLockedServer: data.isLocked || false,
       }));
     } catch (error) {
