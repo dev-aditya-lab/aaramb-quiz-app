@@ -1,19 +1,44 @@
 import NextAuth from "next-auth";
 import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
 import clientPromise from "@/lib/mongodb";
 import { connectMongoose } from "@/lib/mongoose";
 import User from "../../server/models/User";
 
+function buildProviders() {
+  const providers = [];
+
+  if (process.env.GITHUB_ID && process.env.GITHUB_SECRET) {
+    providers.push(
+      GitHubProvider({
+        clientId: process.env.GITHUB_ID,
+        clientSecret: process.env.GITHUB_SECRET,
+        allowDangerousEmailAccountLinking: true,
+      })
+    );
+  }
+
+  if (process.env.GOOGLE_ID && process.env.GOOGLE_SECRET) {
+    providers.push(
+      GoogleProvider({
+        clientId: process.env.GOOGLE_ID,
+        clientSecret: process.env.GOOGLE_SECRET,
+        allowDangerousEmailAccountLinking: true,
+      })
+    );
+  }
+
+  if (!providers.length) {
+    throw new Error("No OAuth providers configured. Add GitHub and/or Google credentials.");
+  }
+
+  return providers;
+}
+
 export const authOptions = {
   adapter: MongoDBAdapter(clientPromise),
-  providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
-  ],
+  providers: buildProviders(),
   session: {
     strategy: "database",
   },

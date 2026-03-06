@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   FiHome,
@@ -17,6 +18,7 @@ import {
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navLinks = [
@@ -73,11 +75,11 @@ export default function Navbar() {
           ) : (
             <button
               type="button"
-              onClick={() => signIn("github")}
+                onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`)}
               className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
             >
               <FiLogIn className="h-4 w-4" />
-              GitHub Login
+                Login
             </button>
           )}
         </div>
@@ -138,12 +140,12 @@ export default function Navbar() {
                 type="button"
                 onClick={() => {
                   setMobileOpen(false);
-                  signIn("github");
+                  router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`);
                 }}
                 className="flex w-full items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-3 py-2.5 text-sm font-semibold text-white"
               >
                 <FiLogIn className="h-4 w-4" />
-                GitHub Login
+                Login
               </button>
             )}
           </div>

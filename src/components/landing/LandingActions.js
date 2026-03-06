@@ -1,17 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { FiArrowRight, FiGithub } from "react-icons/fi";
 import ProfileCompletionModal from "@/components/profile/ProfileCompletionModal";
 
 export default function LandingActions({ sessionUser }) {
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
 
   function onSignUpClick() {
     if (!sessionUser) {
-      signIn("github", { callbackUrl: "/dashboard" });
+      router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`);
       return;
     }
     setShowModal(true);
@@ -21,7 +22,7 @@ export default function LandingActions({ sessionUser }) {
     if (sessionUser) {
       return;
     }
-    signIn("github", { callbackUrl: "/dashboard" });
+    router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`);
   }
 
   return (

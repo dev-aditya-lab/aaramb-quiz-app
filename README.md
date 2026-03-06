@@ -28,6 +28,8 @@ Required values in `.env.local`:
 - `NEXTAUTH_SECRET`
 - `GITHUB_ID`
 - `GITHUB_SECRET`
+- `GOOGLE_ID`
+- `GOOGLE_SECRET`
 - `MONGODB_URI`
 
 ## Architecture
