@@ -14,8 +14,8 @@ export default async function AttemptPage({ params }) {
     <div className="relative min-h-screen bg-slate-950 font-sans selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* Background Ambience */}
       <div className="pointer-events-none fixed inset-0 -z-10 flex overflow-hidden">
-        <div className="absolute -top-[40%] left-[20%] h-[1000px] w-[1000px] rounded-full bg-purple-600/10 blur-[120px]" />
-        <div className="absolute top-[60%] -left-[10%] h-[800px] w-[800px] rounded-full bg-cyan-500/10 blur-[120px]" />
+        <div className="absolute -top-[40%] left-[20%] h-250 w-250 rounded-full bg-purple-600/10 blur-[120px]" />
+        <div className="absolute top-[60%] -left-[10%] h-200 w-200 rounded-full bg-cyan-500/10 blur-[120px]" />
         <div
           className="absolute inset-0 z-0 bg-repeat opacity-[0.03]"
           style={{

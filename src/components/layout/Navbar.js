@@ -86,7 +86,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`)}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-linear-to-r from-cyan-500 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
               >
                 <FiLogIn className="h-4 w-4" />
                 Login
@@ -165,7 +165,7 @@ export default function Navbar() {
                     setMobileOpen(false);
                     router.push(`/login?callbackUrl=${encodeURIComponent("/dashboard")}`);
                   }}
-                  className="flex w-full items-center gap-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-600 px-3 py-2.5 text-sm font-semibold text-white"
+                  className="flex w-full items-center gap-2 rounded-lg bg-linear-to-r from-cyan-500 to-purple-600 px-3 py-2.5 text-sm font-semibold text-white"
                 >
                   <FiLogIn className="h-4 w-4" />
                   Login

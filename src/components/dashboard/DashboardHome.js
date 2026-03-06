@@ -39,7 +39,7 @@ export default function DashboardHome({ sessionUser, hasRunningQuiz }) {
       ) : null}
 
       {/* ─── Welcome Header ─── */}
-      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
+      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-linear-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
         <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl" />
 
@@ -77,7 +77,7 @@ export default function DashboardHome({ sessionUser, hasRunningQuiz }) {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {/* Quiz Status */}
         <div className={`rounded-2xl border p-5 shadow-sm transition-all ${hasRunningQuiz
-            ? "border-emerald-500/30 bg-gradient-to-br from-emerald-950/50 to-slate-900"
+            ? "border-emerald-500/30 bg-linear-to-br from-emerald-950/50 to-slate-900"
             : "border-slate-700/50 bg-slate-800/60"
           }`}>
           <div className="flex items-center gap-3">
@@ -141,15 +141,15 @@ export default function DashboardHome({ sessionUser, hasRunningQuiz }) {
         </p>
         <ul className="mt-3 space-y-2 text-sm text-slate-400">
           <li className="flex items-start gap-2">
-            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
+            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
             Tab switching and copy/paste are blocked and logged.
           </li>
           <li className="flex items-start gap-2">
-            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
+            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
             Questions are served one-by-one from the backend.
           </li>
           <li className="flex items-start gap-2">
-            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-blue-400" />
+            <FiAlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-400" />
             Server validates timing for each submission.
           </li>
         </ul>
@@ -158,7 +158,7 @@ export default function DashboardHome({ sessionUser, hasRunningQuiz }) {
       {/* ─── No Running Quiz Banner ─── */}
       {!hasRunningQuiz && (
         <div className="rounded-2xl border border-amber-500/20 bg-amber-950/20 p-5 flex items-center gap-3">
-          <FiClock className="h-5 w-5 flex-shrink-0 text-amber-400" />
+          <FiClock className="h-5 w-5 shrink-0 text-amber-400" />
           <p className="text-sm text-amber-300/80">
             No quizzes are currently running. Please check back later for upcoming quizzes and events.
           </p>

@@ -33,7 +33,7 @@ export default function AdminQuizzesTab({
                 {canCreateQuiz && !showForm && !editingQuizId && (
                     <button
                         onClick={() => setShowForm(true)}
-                        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
+                        className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
                     >
                         <FiPlusCircle className="h-4 w-4" />
                         Create Quiz
@@ -206,7 +206,7 @@ export default function AdminQuizzesTab({
                         <div className="flex items-center gap-3">
                             <button
                                 type="submit"
-                                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
+                                className="inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30"
                             >
                                 <FiPlusCircle className="h-4 w-4" />
                                 {editingQuizId ? "Update Quiz" : "Save Quiz"}

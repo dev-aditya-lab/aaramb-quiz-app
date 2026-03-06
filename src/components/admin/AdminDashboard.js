@@ -340,7 +340,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-6">
       {/* ─── Header ─── */}
-      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
+      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-linear-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
         <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-amber-500/10 blur-3xl" />
         <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -378,7 +378,7 @@ export default function AdminDashboard() {
       {/* ─── Global Error ─── */}
       {error && (
         <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/30 p-4 text-sm text-rose-300">
-          <FiAlertTriangle className="h-4 w-4 flex-shrink-0" />
+          <FiAlertTriangle className="h-4 w-4 shrink-0" />
           {error}
           <button
             type="button"

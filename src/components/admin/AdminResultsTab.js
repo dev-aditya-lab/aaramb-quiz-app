@@ -319,11 +319,11 @@ export default function AdminResultsTab({
               ) : null}
 
               {filteredResults.map((row) => (
-                <tr key={row._id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
-                  <td className="px-4 py-3 text-sm font-medium text-white max-w-[200px] truncate" title={row.userId?.email}>
+                <tr key={row._id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
+                  <td className="px-4 py-3 text-sm font-medium text-white max-w-50 truncate" title={row.userId?.email}>
                     {row.userId?.name || row.userId?.email || "Unknown"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-400 max-w-[200px] truncate" title={row.quizId?.title}>
+                  <td className="px-4 py-3 text-sm text-slate-400 max-w-50 truncate" title={row.quizId?.title}>
                     {row.quizId?.title || "Unknown"}
                   </td>
                   <td className="px-4 py-3">
@@ -343,7 +343,7 @@ export default function AdminResultsTab({
                   </td>
                   <td className="px-4 py-3 text-sm font-semibold text-cyan-300">{row.totalScore ?? 0}</td>
                   <td className="px-4 py-3 text-sm text-amber-300">{row.warnings ?? 0}</td>
-                  <td className="px-4 py-3 text-xs text-rose-300 max-w-[220px] truncate" title={row.disqualifyReason || ""}>
+                  <td className="px-4 py-3 text-xs text-rose-300 max-w-55 truncate" title={row.disqualifyReason || ""}>
                     {row.disqualifyReason || "-"}
                   </td>
                   <td className="px-4 py-3 text-right">

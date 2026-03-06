@@ -104,7 +104,7 @@ export default function AdminUsersTab({
                                     {canManageRoles && (
                                         <>
                                             <select
-                                                className={`${selectClass} !py-2 text-xs`}
+                                                className={`${selectClass} py-2! text-xs`}
                                                 value={roleSelectionByUser[user._id] ?? user.role ?? "user"}
                                                 onChange={(e) =>
                                                     setRoleSelectionByUser((current) => ({
@@ -139,7 +139,7 @@ export default function AdminUsersTab({
                                     </button>
 
                                     <select
-                                        className={`${selectClass} !py-2 text-xs`}
+                                        className={`${selectClass} py-2! text-xs`}
                                         value={disqualifyQuizIdByUser[user._id] || ""}
                                         onChange={(e) =>
                                             setDisqualifyQuizIdByUser((c) => ({

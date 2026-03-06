@@ -7,9 +7,9 @@ export default function LandingHero({ children }) {
     return (
         <section className="relative overflow-hidden py-20 md:py-28 lg:py-32">
             {/* Background orbs */}
-            <div className="landing-orb landing-orb-cyan w-[500px] h-[500px] -top-40 -left-40 landing-float" />
-            <div className="landing-orb landing-orb-purple w-[400px] h-[400px] top-20 right-0 landing-float delay-300" style={{ animationDelay: "2s" }} />
-            <div className="landing-orb landing-orb-pink w-[350px] h-[350px] bottom-0 left-1/3 landing-float" style={{ animationDelay: "4s" }} />
+            <div className="landing-orb landing-orb-cyan w-125 h-125 -top-40 -left-40 landing-float" />
+            <div className="landing-orb landing-orb-purple w-100 h-100 top-20 right-0 landing-float delay-300" style={{ animationDelay: "2s" }} />
+            <div className="landing-orb landing-orb-pink w-87.5 h-87.5 bottom-0 left-1/3 landing-float" style={{ animationDelay: "4s" }} />
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="grid items-center gap-12 lg:grid-cols-2">
@@ -57,7 +57,7 @@ export default function LandingHero({ children }) {
                     {/* Right: Hero illustration */}
                     <div className="landing-fade-right delay-300 flex justify-center lg:justify-end">
                         <div className="relative">
-                            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 blur-3xl" />
+                            <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-cyan-500/20 to-purple-500/20 blur-3xl" />
                             <Image
                                 src="/hero-illustration.png"
                                 alt="Aarambh Quiz Platform - Interactive quiz experience"

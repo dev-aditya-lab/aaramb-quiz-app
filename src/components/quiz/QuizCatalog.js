@@ -119,7 +119,7 @@ export default function QuizCatalog() {
 
               <div className="mt-4 rounded-xl border border-slate-700/40 bg-slate-900/40 p-4">
                 <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Description / Instructions</p>
-                <p className="mt-2 min-h-[52px] text-sm leading-6 text-slate-300">
+                <p className="mt-2 min-h-13 text-sm leading-6 text-slate-300">
                   {quiz.description || "No instructions provided yet. Please read quiz rules carefully before starting."}
                 </p>
               </div>
@@ -152,7 +152,7 @@ export default function QuizCatalog() {
                   type="button"
                   disabled={loadingId === quiz._id}
                   onClick={() => onStart(quiz._id)}
-                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+                  className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-purple-600 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
                 >
                   <FiPlayCircle className="h-4 w-4" />
                   {loadingId === quiz._id ? "Starting..." : "Start Quiz"}

@@ -68,8 +68,8 @@ export default async function HomePage() {
 
       {/* ─── CTA ─── */}
       <section className="relative py-20 md:py-24">
-        <div className="landing-orb landing-orb-cyan w-[400px] h-[400px] top-0 left-1/4" />
-        <div className="landing-orb landing-orb-purple w-[300px] h-[300px] bottom-0 right-1/4" />
+        <div className="landing-orb landing-orb-cyan w-100 h-100 top-0 left-1/4" />
+        <div className="landing-orb landing-orb-purple w-75 h-75 bottom-0 right-1/4" />
 
         <div className="relative z-10 mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center landing-fade-up">
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">

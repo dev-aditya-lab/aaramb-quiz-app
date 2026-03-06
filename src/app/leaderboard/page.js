@@ -156,7 +156,7 @@ export default function LeaderboardPage() {
                 {rows.map((row, index) => {
                   const rank = index + 1;
                   return (
-                    <tr key={row._id} className="border-t border-slate-800/80 hover:bg-white/[0.03]">
+                    <tr key={row._id} className="border-t border-slate-800/80 hover:bg-white/3">
                       <td className="px-4 py-3">
                         <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-bold ${rankStyle(rank)}`}>#{rank}</span>
                       </td>

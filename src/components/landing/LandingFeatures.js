@@ -69,7 +69,7 @@ const FEATURES = [
 export default function LandingFeatures() {
     return (
         <section className="relative py-20 md:py-24">
-            <div className="landing-orb landing-orb-cyan w-[300px] h-[300px] top-0 right-0" />
+            <div className="landing-orb landing-orb-cyan w-75 h-75 top-0 right-0" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center landing-fade-up">
@@ -105,7 +105,7 @@ export default function LandingFeatures() {
                                 {feature.description}
                             </p>
                             <div
-                                className={`mt-4 h-0.5 w-12 rounded-full bg-gradient-to-r ${feature.color}`}
+                                className={`mt-4 h-0.5 w-12 rounded-full bg-linear-to-r ${feature.color}`}
                             />
                         </div>
                     ))}

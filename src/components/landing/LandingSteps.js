@@ -32,7 +32,7 @@ const STEPS = [
 export default function LandingSteps() {
     return (
         <section className="relative py-20 md:py-24">
-            <div className="landing-orb landing-orb-purple w-[350px] h-[350px] -bottom-20 left-0" />
+            <div className="landing-orb landing-orb-purple w-87.5 h-87.5 -bottom-20 left-0" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="text-center landing-fade-up">
@@ -54,18 +54,18 @@ export default function LandingSteps() {
                         >
                             {/* Connector line */}
                             {index < STEPS.length - 1 && (
-                                <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-[2px]">
-                                    <div className={`h-full bg-gradient-to-r ${step.color} opacity-30 rounded-full`} />
+                                <div className="hidden md:block absolute top-12 left-[60%] w-[80%] h-0.5">
+                                    <div className={`h-full bg-linear-to-r ${step.color} opacity-30 rounded-full`} />
                                 </div>
                             )}
 
                             <div className="landing-glass landing-card-hover rounded-2xl p-8 text-center relative z-10">
                                 {/* Step number */}
-                                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${step.color} mb-5`}>
+                                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-linear-to-br ${step.color} mb-5`}>
                                     <step.icon className="w-7 h-7 text-white" />
                                 </div>
 
-                                <p className={`text-xs font-bold uppercase tracking-widest bg-gradient-to-r ${step.color} bg-clip-text text-transparent`}>
+                                <p className={`text-xs font-bold uppercase tracking-widest bg-linear-to-r ${step.color} bg-clip-text text-transparent`}>
                                     Step {step.number}
                                 </p>
 

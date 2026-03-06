@@ -31,7 +31,7 @@ export default function AdminAuditLogsTab({ rows }) {
               ) : null}
 
               {safeRows.map((row) => (
-                <tr key={row._id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                <tr key={row._id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
                   <td className="px-4 py-3 text-sm text-white">
                     <div className="inline-flex items-center gap-2">
                       <FiUser className="h-3.5 w-3.5 text-slate-500" />

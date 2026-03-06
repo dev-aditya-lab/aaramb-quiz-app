@@ -148,13 +148,13 @@ export default function ProfilePage() {
   return (
     <section className="space-y-6">
       {/* ─── Profile Header ─── */}
-      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
+      <header className="relative overflow-hidden rounded-2xl border border-slate-700/50 bg-linear-to-br from-slate-800 via-slate-800 to-slate-900 p-6 md:p-8 shadow-xl">
         <div className="absolute -top-20 -right-20 h-60 w-60 rounded-full bg-cyan-500/10 blur-3xl" />
         <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-purple-500/10 blur-3xl" />
 
         <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center">
           {/* Avatar */}
-          <div className="relative flex-shrink-0">
+          <div className="relative shrink-0">
             {form.image ? (
               <Image
                 src={form.image}
@@ -164,7 +164,7 @@ export default function ProfilePage() {
                 className="rounded-2xl border-2 border-white/10 object-cover"
               />
             ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-white/10 bg-gradient-to-br from-cyan-500/20 to-purple-500/20">
+              <div className="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-white/10 bg-linear-to-br from-cyan-500/20 to-purple-500/20">
                 <FiUser className="h-8 w-8 text-slate-400" />
               </div>
             )}
@@ -304,13 +304,13 @@ export default function ProfilePage() {
         {/* Messages */}
         {error && (
           <div className="mt-5 flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/30 p-3 text-sm text-rose-300">
-            <FiAlertCircle className="h-4 w-4 flex-shrink-0" />
+            <FiAlertCircle className="h-4 w-4 shrink-0" />
             {error}
           </div>
         )}
         {success && (
           <div className="mt-5 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-950/30 p-3 text-sm text-emerald-300">
-            <FiCheckCircle className="h-4 w-4 flex-shrink-0" />
+            <FiCheckCircle className="h-4 w-4 shrink-0" />
             {success}
           </div>
         )}
@@ -318,7 +318,7 @@ export default function ProfilePage() {
         <button
           type="submit"
           disabled={saving || !canSubmit}
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-linear-to-r from-cyan-500 to-purple-600 px-6 py-2.5 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition-all hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FiSave className="h-4 w-4" />
           {saving ? "Saving..." : "Save Profile"}
@@ -352,7 +352,7 @@ export default function ProfilePage() {
               </thead>
               <tbody>
                 {history.map((attempt) => (
-                  <tr key={attempt._id} className="border-b border-white/5 hover:bg-white/[0.03] transition-colors">
+                  <tr key={attempt._id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
                     <td className="px-4 py-3.5 text-sm font-medium text-white">
                       {attempt.quizId?.title || "Quiz"}
                     </td>

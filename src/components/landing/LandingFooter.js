@@ -7,7 +7,7 @@ export default function LandingFooter() {
         <footer className="relative py-12 md:py-16">
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 {/* Top border gradient */}
-                <div className="h-px w-full bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent mb-12" />
+                <div className="h-px w-full bg-linear-to-r from-transparent via-cyan-500/30 to-transparent mb-12" />
 
                 <div className="flex flex-col items-center text-center gap-6">
                     {/* Brand */}
@@ -22,7 +22,7 @@ export default function LandingFooter() {
                     </div>
 
                     {/* Divider */}
-                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                    <div className="h-px w-24 bg-linear-to-r from-transparent via-white/10 to-transparent" />
 
                     {/* Developer credit */}
                     <div className="landing-glass rounded-2xl px-6 py-4 inline-flex flex-col items-center gap-2">

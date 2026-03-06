@@ -232,7 +232,7 @@ export default function QuizSession({ attemptId }) {
             <p className="text-2xl font-bold text-white">{score}</p>
           </div>
 
-          <div className="flex min-w-[120px] items-center justify-center gap-2 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-purple-600/20 px-4 py-3 border border-cyan-500/30">
+          <div className="flex min-w-30 items-center justify-center gap-2 rounded-2xl bg-linear-to-br from-cyan-500/20 to-purple-600/20 px-4 py-3 border border-cyan-500/30">
             <FiClock className="h-5 w-5 text-cyan-400 animate-pulse" />
             <span className="text-xl font-mono font-bold text-white tracking-widest">
               {secondsLeft === null ? "∞" : secondsLeft < 10 ? `0${secondsLeft}` : secondsLeft}
@@ -249,7 +249,7 @@ export default function QuizSession({ attemptId }) {
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
           <div
-            className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 transition-all duration-500 ease-out"
+            className="h-full bg-linear-to-r from-cyan-500 to-purple-600 transition-all duration-500 ease-out"
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -307,7 +307,7 @@ export default function QuizSession({ attemptId }) {
                 </span>
 
                 {/* Visual indicator on hover */}
-                <div className="absolute inset-0 -z-10 rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
+                <div className="absolute inset-0 -z-10 rounded-2xl bg-linear-to-r from-cyan-500/0 via-cyan-500/0 to-cyan-500/5 opacity-0 transition-opacity group-hover:opacity-100" />
               </button>
             );
           })}
