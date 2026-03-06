@@ -10,6 +10,7 @@ import {
   disqualifyUser,
   fetchAdminQuizDetail,
   fetchAdminQuizzes,
+  fetchAdminAuditLogs,
   fetchAdminResults,
   fetchAdminStats,
   fetchAdminUsers,
@@ -25,6 +26,7 @@ import AdminOverviewTab from "./AdminOverviewTab";
 import AdminQuizzesTab from "./AdminQuizzesTab";
 import AdminUsersTab from "./AdminUsersTab";
 import AdminResultsTab from "./AdminResultsTab";
+import AdminAuditLogsTab from "./AdminAuditLogsTab";
 
 const emptyForm = {
   title: "",
@@ -69,6 +71,7 @@ export default function AdminDashboard() {
   const [quizzes, setQuizzes] = useState([]);
   const [users, setUsers] = useState([]);
   const [results, setResults] = useState([]);
+  const [auditLogs, setAuditLogs] = useState([]);
   const [form, setForm] = useState(emptyForm);
   const [questionJson, setQuestionJson] = useState("[]");
   const [disqualifyQuizIdByUser, setDisqualifyQuizIdByUser] = useState({});
@@ -93,6 +96,9 @@ export default function AdminDashboard() {
       setQuizzes(q.quizzes || []);
       setUsers(u.users || []);
       setResults(r.rows || []);
+
+      const logsResponse = await fetchAdminAuditLogs();
+      setAuditLogs(logsResponse.rows || []);
     } catch (err) {
       setError(err.message || "Failed to load admin dashboard");
     }
@@ -282,6 +288,7 @@ export default function AdminDashboard() {
     { id: "quizzes", label: "Quizzes" },
     { id: "users", label: "Users" },
     { id: "results", label: "Results & Requests" },
+    { id: "auditLogs", label: "Manager Logs" },
   ];
 
   return (
@@ -382,6 +389,10 @@ export default function AdminDashboard() {
           onUnlockAttempt={handleUnlockAttempt}
           onResetAttempt={handleResetAttempt}
         />
+      )}
+
+      {activeTab === "auditLogs" && (
+        <AdminAuditLogsTab rows={auditLogs} />
       )}
 
     </div>

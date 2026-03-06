@@ -265,15 +265,40 @@ async function listQuizzesForAdmin() {
 }
 
 async function listResults(filters = {}) {
-  const query = { status: { $in: ["submitted", "disqualified", "expired"] } };
+  const query = { status: { $in: ["submitted", "disqualified", "expired", "in_progress"] } };
   if (filters.quizId) {
     query.quizId = filters.quizId;
   }
 
+  if (filters.status === "submitted") {
+    query.status = "submitted";
+  } else if (filters.status === "disqualified") {
+    query.status = "disqualified";
+  } else if (filters.status === "expired") {
+    query.status = "expired";
+  } else if (filters.status === "in_progress") {
+    query.status = "in_progress";
+  }
+
+  if (filters.isLocked === true) {
+    query.isLocked = true;
+  }
+
+  let sort = { submittedAt: -1, updatedAt: -1 };
+  if (filters.sortBy === "rank") {
+    sort = { totalScore: -1, submittedAt: 1, createdAt: 1 };
+  } else if (filters.sortBy === "score_desc") {
+    sort = { totalScore: -1, submittedAt: -1, createdAt: -1 };
+  } else if (filters.sortBy === "score_asc") {
+    sort = { totalScore: 1, submittedAt: -1, createdAt: -1 };
+  } else if (filters.sortBy === "oldest") {
+    sort = { createdAt: 1 };
+  }
+
   return Attempt.find(query)
-    .sort({ submittedAt: -1, updatedAt: -1 })
+    .sort(sort)
     .limit(1000)
-    .populate("userId", "name email")
+    .populate("userId", "name email fullName branch yearOfStudy studentId phoneNumber")
     .populate("quizId", "title")
     .lean();
 }
@@ -305,10 +330,17 @@ function escapeCsv(value) {
 function buildResultsCsv(rows) {
   const headers = [
     "Attempt ID",
+    "Rank",
     "User Name",
+    "Full Name",
     "User Email",
+    "Student ID",
+    "Branch",
+    "Year",
+    "Phone",
     "Quiz Title",
     "Status",
+    "Disqualify Reason",
     "Score",
     "Warnings",
     "Started At",
@@ -316,14 +348,38 @@ function buildResultsCsv(rows) {
   ];
 
   const lines = [headers.join(",")];
+  const rankingRows = rows
+    .filter((row) => row.status === "submitted")
+    .slice()
+    .sort((a, b) => {
+      const scoreDiff = (b.totalScore ?? 0) - (a.totalScore ?? 0);
+      if (scoreDiff !== 0) return scoreDiff;
+      const aSubmitted = a.submittedAt ? new Date(a.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+      const bSubmitted = b.submittedAt ? new Date(b.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+      return aSubmitted - bSubmitted;
+    });
+
+  const rankByAttemptId = new Map();
+  rankingRows.forEach((row, index) => {
+    rankByAttemptId.set(String(row._id), index + 1);
+  });
+
   for (const row of rows) {
+    const user = row.userId || {};
     lines.push(
       [
         escapeCsv(row._id),
-        escapeCsv(row.userId?.name || ""),
-        escapeCsv(row.userId?.email || ""),
+        escapeCsv(rankByAttemptId.get(String(row._id)) || ""),
+        escapeCsv(user.name || ""),
+        escapeCsv(user.fullName || ""),
+        escapeCsv(user.email || ""),
+        escapeCsv(user.studentId || ""),
+        escapeCsv(user.branch || ""),
+        escapeCsv(user.yearOfStudy ?? ""),
+        escapeCsv(user.phoneNumber || ""),
         escapeCsv(row.quizId?.title || ""),
         escapeCsv(row.status || ""),
+        escapeCsv(row.disqualifyReason || ""),
         escapeCsv(row.totalScore ?? 0),
         escapeCsv(row.warnings ?? 0),
         escapeCsv(row.startedAt ? new Date(row.startedAt).toISOString() : ""),
@@ -331,6 +387,64 @@ function buildResultsCsv(rows) {
       ].join(",")
     );
   }
+
+  return lines.join("\n");
+}
+
+function buildRankedResultsCsv(rows) {
+  const submittedRows = rows
+    .filter((row) => row.status === "submitted")
+    .slice()
+    .sort((a, b) => {
+      const scoreDiff = (b.totalScore ?? 0) - (a.totalScore ?? 0);
+      if (scoreDiff !== 0) return scoreDiff;
+      const aSubmitted = a.submittedAt ? new Date(a.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+      const bSubmitted = b.submittedAt ? new Date(b.submittedAt).getTime() : Number.MAX_SAFE_INTEGER;
+      return aSubmitted - bSubmitted;
+    });
+
+  const headers = [
+    "Rank",
+    "Attempt ID",
+    "User Name",
+    "Full Name",
+    "User Email",
+    "Student ID",
+    "Branch",
+    "Year",
+    "Phone",
+    "Quiz Title",
+    "Score",
+    "Warnings",
+    "Disqualify Reason",
+    "Started At",
+    "Submitted At",
+  ];
+
+  const lines = [headers.join(",")];
+
+  submittedRows.forEach((row, index) => {
+    const user = row.userId || {};
+    lines.push(
+      [
+        escapeCsv(index + 1),
+        escapeCsv(row._id),
+        escapeCsv(user.name || ""),
+        escapeCsv(user.fullName || ""),
+        escapeCsv(user.email || ""),
+        escapeCsv(user.studentId || ""),
+        escapeCsv(user.branch || ""),
+        escapeCsv(user.yearOfStudy ?? ""),
+        escapeCsv(user.phoneNumber || ""),
+        escapeCsv(row.quizId?.title || ""),
+        escapeCsv(row.totalScore ?? 0),
+        escapeCsv(row.warnings ?? 0),
+        escapeCsv(row.disqualifyReason || ""),
+        escapeCsv(row.startedAt ? new Date(row.startedAt).toISOString() : ""),
+        escapeCsv(row.submittedAt ? new Date(row.submittedAt).toISOString() : ""),
+      ].join(",")
+    );
+  });
 
   return lines.join("\n");
 }
@@ -352,4 +466,5 @@ module.exports = {
   createAuditLog,
   listAuditLogs,
   buildResultsCsv,
+  buildRankedResultsCsv,
 };

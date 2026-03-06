@@ -13,6 +13,32 @@ export default function AdminResultsTab({
     const [searchQuery, setSearchQuery] = useState("");
     const [statusFilter, setStatusFilter] = useState("all");
     const [exportQuizId, setExportQuizId] = useState("all");
+    const [exportStatus, setExportStatus] = useState("joined");
+    const [exportSortBy, setExportSortBy] = useState("latest");
+    const [rankedQuizId, setRankedQuizId] = useState("all");
+
+    const filteredExportHref = useMemo(() => {
+        const params = new URLSearchParams();
+        if (exportQuizId !== "all") params.set("quizId", exportQuizId);
+        if (exportStatus !== "all") params.set("status", exportStatus);
+        if (exportSortBy !== "latest") params.set("sortBy", exportSortBy);
+        return `/api/admin/results/export${params.toString() ? `?${params.toString()}` : ""}`;
+    }, [exportQuizId, exportStatus, exportSortBy]);
+
+    const quickExportHref = (status) => {
+        const params = new URLSearchParams();
+        if (exportQuizId !== "all") params.set("quizId", exportQuizId);
+        params.set("status", status);
+        if (exportSortBy !== "latest") params.set("sortBy", exportSortBy);
+        return `/api/admin/results/export?${params.toString()}`;
+    };
+
+    const rankedExportHref = useMemo(() => {
+        const params = new URLSearchParams();
+        params.set("mode", "ranked");
+        if (rankedQuizId !== "all") params.set("quizId", rankedQuizId);
+        return `/api/admin/results/export?${params.toString()}`;
+    }, [rankedQuizId]);
 
     const filteredResults = useMemo(() => {
         return results.filter(row => {
@@ -41,26 +67,87 @@ export default function AdminResultsTab({
                         <FiCheckSquare className="h-5 w-5 text-cyan-400" />
                         Results & Requests
                     </h2>
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                        <select
-                            value={exportQuizId}
-                            onChange={(e) => setExportQuizId(e.target.value)}
-                            className={`${selectClass} min-w-[240px]`}
-                        >
-                            <option value="all">All quizzes</option>
-                            {(quizzes || []).map((quiz) => (
-                                <option key={quiz._id} value={quiz._id}>
-                                    {quiz.title}
-                                </option>
-                            ))}
-                        </select>
-                        <a
-                            href={exportQuizId === "all" ? "/api/admin/results/export" : `/api/admin/results/export?quizId=${exportQuizId}`}
-                            className={`${btnOutline} shrink-0`}
-                        >
-                            <FiDownload className="h-3.5 w-3.5" />
-                            Export CSV
-                        </a>
+                </div>
+
+                <div className="mb-6 grid gap-4 md:grid-cols-2">
+                    <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-4">
+                        <p className="text-sm font-semibold text-cyan-300">Ranked Quiz Export</p>
+                        <p className="mt-1 text-xs text-slate-400">Download rank-wise results with full user details and score (submitted attempts only).</p>
+                        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <select
+                                value={rankedQuizId}
+                                onChange={(e) => setRankedQuizId(e.target.value)}
+                                className={`${selectClass} min-w-[220px]`}
+                            >
+                                <option value="all">All quizzes</option>
+                                {(quizzes || []).map((quiz) => (
+                                    <option key={quiz._id} value={quiz._id}>
+                                        {quiz.title}
+                                    </option>
+                                ))}
+                            </select>
+                            <a href={rankedExportHref} className={`${btnOutline} shrink-0`}>
+                                <FiDownload className="h-3.5 w-3.5" />
+                                Export Ranked CSV
+                            </a>
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-slate-700/40 bg-slate-900/30 p-4">
+                        <p className="text-sm font-semibold text-white">Filtered Export</p>
+                        <p className="mt-1 text-xs text-slate-400">Download all joined users or specific result status like submitted/disqualified (with reason)/expired.</p>
+                        <div className="mt-3 flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                                <select
+                                    value={exportQuizId}
+                                    onChange={(e) => setExportQuizId(e.target.value)}
+                                    className={`${selectClass} min-w-[220px]`}
+                                >
+                                    <option value="all">All quizzes</option>
+                                    {(quizzes || []).map((quiz) => (
+                                        <option key={quiz._id} value={quiz._id}>
+                                            {quiz.title}
+                                        </option>
+                                    ))}
+                                </select>
+                                <select
+                                    value={exportStatus}
+                                    onChange={(e) => setExportStatus(e.target.value)}
+                                    className={`${selectClass} min-w-[220px]`}
+                                >
+                                    <option value="joined">All Joined</option>
+                                    <option value="submitted">Submitted Only</option>
+                                    <option value="disqualified">Disqualified Only</option>
+                                    <option value="expired">Expired Only</option>
+                                    <option value="in_progress">In Progress Only</option>
+                                    <option value="locked">Locked Only</option>
+                                </select>
+                                <select
+                                    value={exportSortBy}
+                                    onChange={(e) => setExportSortBy(e.target.value)}
+                                    className={`${selectClass} min-w-[220px]`}
+                                >
+                                    <option value="latest">Sort: Latest</option>
+                                    <option value="oldest">Sort: Oldest</option>
+                                    <option value="score_desc">Sort: Score High → Low</option>
+                                    <option value="score_asc">Sort: Score Low → High</option>
+                                    <option value="rank">Sort: Rank</option>
+                                </select>
+                            </div>
+
+                            <a href={filteredExportHref} className={`${btnOutline} w-fit`}>
+                                <FiDownload className="h-3.5 w-3.5" />
+                                Export Filtered CSV
+                            </a>
+
+                            <div className="mt-2 flex flex-wrap gap-2">
+                                <a href={quickExportHref("joined")} className={btnOutline}>Export All Joined</a>
+                                <a href={quickExportHref("submitted")} className={btnOutline}>Export Submitted Only</a>
+                                <a href={quickExportHref("disqualified")} className={btnOutline}>Export Disqualified + Reason</a>
+                                <a href={quickExportHref("expired")} className={btnOutline}>Export Expired Only</a>
+                                <a href={quickExportHref("in_progress")} className={btnOutline}>Export In Progress</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
